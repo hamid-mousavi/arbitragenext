@@ -83,23 +83,22 @@ const LiveChart = () => {
                   if (result.difference > bestArbitrage.difference) {
                       setBestArbitrage({ time: now, difference: result.difference });
 
-             
+                    //   // ✅ ارسال به تلگرام
+                    //   const message = `
+                    //   🚀 *بهترین فرصت آربیتراژ در ۲۴ ساعت اخیر!* 🚀
+                    //   ⏰ زمان: ${now}
+                    //   🔍 اختلاف قیمت: ${result.difference.toLocaleString()} ریال
+                    //   💰 *قیمت نوبیتکس:* ${result.nobitex.toLocaleString()} ریال
+                    //   💰 *قیمت والکس:* ${result.wallex.toLocaleString()} ریال
+                    //   📢 فرصت را از دست ندهید!
+                    //   `;
+                    //   sendTelegramMessage(message);
                   }
 
                   // ارسال نوتیفیکیشن اگر اختلاف زیاد باشد
-                  if (result.difference > 5000) {
+                  if (result.difference > 15000) {
                       sendNotification("🚀 فرصت آربیتراژ!", `اختلاف قیمت به ${result.difference.toLocaleString()} ریال رسید!`);
-                       // ✅ ارسال به تلگرام
-                      const message = `
-                      🚀 *بهترین فرصت آربیتراژ در ۲۴ ساعت اخیر!* 🚀
-                      ⏰ زمان: ${now}
-                      🔍 اختلاف قیمت: ${result.difference.toLocaleString()} ریال
-                      💰 *قیمت نوبیتکس:* ${result.nobitex.toLocaleString()} ریال
-                      💰 *قیمت والکس:* ${result.wallex.toLocaleString()} ریال
-                      📢 فرصت را از دست ندهید!
-                      `;
-                      sendTelegramMessage(message);
-                    }
+                  }
               } else {
                   console.warn('⚠️ مقدار نامعتبر از API:', result);
               }
