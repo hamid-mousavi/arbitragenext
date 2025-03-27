@@ -45,7 +45,7 @@ export async function GET(req: NextRequest) {
         }
 
         // بررسی اختلاف قیمت برای ارسال پیام
-        if (result.difference > 5000) {
+        if (result.difference > 15000) {
             const message = `🚀 فرصت آربیتراژ!\n\n💰 قیمت نوبیتکس: ${result.nobitex}\n💰 قیمت والکس: ${result.wallex}\n🔍 اختلاف قیمت: ${result.difference}`;
             
             await axios.post(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
