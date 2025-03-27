@@ -83,7 +83,7 @@ const LiveChart = () => {
                   if (result.difference > bestArbitrage.difference) {
                       setBestArbitrage({ time: now, difference: result.difference });
 
-                     
+             
                   }
 
                   // ارسال نوتیفیکیشن اگر اختلاف زیاد باشد
@@ -99,7 +99,7 @@ const LiveChart = () => {
                       📢 فرصت را از دست ندهید!
                       `;
                       sendTelegramMessage(message);
-                  }
+                    }
               } else {
                   console.warn('⚠️ مقدار نامعتبر از API:', result);
               }
