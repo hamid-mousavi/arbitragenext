@@ -7,7 +7,7 @@
     "crons": [
       {
         "path": "/api/sendTelegram",
-        "schedule": "*/1 * * * *"
+        "schedule": "0 09 * * *  "
       }
     ]
   }
