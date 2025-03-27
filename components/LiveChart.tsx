@@ -83,7 +83,13 @@ const LiveChart = () => {
                   if (result.difference > bestArbitrage.difference) {
                       setBestArbitrage({ time: now, difference: result.difference });
 
-                      // ✅ ارسال به تلگرام
+                     
+                  }
+
+                  // ارسال نوتیفیکیشن اگر اختلاف زیاد باشد
+                  if (result.difference > 5000) {
+                      sendNotification("🚀 فرصت آربیتراژ!", `اختلاف قیمت به ${result.difference.toLocaleString()} ریال رسید!`);
+                       // ✅ ارسال به تلگرام
                       const message = `
                       🚀 *بهترین فرصت آربیتراژ در ۲۴ ساعت اخیر!* 🚀
                       ⏰ زمان: ${now}
@@ -93,11 +99,6 @@ const LiveChart = () => {
                       📢 فرصت را از دست ندهید!
                       `;
                       sendTelegramMessage(message);
-                  }
-
-                  // ارسال نوتیفیکیشن اگر اختلاف زیاد باشد
-                  if (result.difference > 15000) {
-                      sendNotification("🚀 فرصت آربیتراژ!", `اختلاف قیمت به ${result.difference.toLocaleString()} ریال رسید!`);
                   }
               } else {
                   console.warn('⚠️ مقدار نامعتبر از API:', result);
