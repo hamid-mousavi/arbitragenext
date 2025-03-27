@@ -3,6 +3,12 @@
       "app/api/**": {
         "maxDuration": 30
       }
-    }
+    },
+    "crons": [
+      {
+        "path": "/api/sendTelegram",
+        "schedule": "*/1 * * * *"
+      }
+    ]
   }
   
