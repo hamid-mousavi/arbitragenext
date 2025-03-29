@@ -4,13 +4,32 @@ import { NextResponse } from 'next/server';
 
 // 📌 لیست ۱۰ جفت ارز برتر برای تست اولیه
 const TEST_PAIRS = [
-    'usdt-rls', 'btc-rls', 'eth-rls', 'xrp-rls', 'ada-rls',
+    'usdt-rls','usdc-rls', 'btc-rls', 'eth-rls', 'xrp-rls', 'ada-rls',
     'dot-rls', 'doge-rls', 'trx-rls', 'ltc-rls', 'bnb-rls'
 ];
 
-// 📌 دریافت فقط این ۱۰ جفت ارز
+// 📌 دریافت لیست جفت‌ارزهای نوبیتکس
+// async function getNobitexPairs() {
+//     try {
+//         const response = await fetch('https://api.nobitex.ir/market/stats');
+//         const data = await response.json();
+//         return Object.keys(data?.stats || {}); // همه جفت‌ارزها
+//     } catch (error) {
+//         console.error('❌ خطا در دریافت لیست جفت‌ارزهای نوبیتکس:', error);
+//         return [];
+//     }
+// }
 async function getNobitexPairs() {
-    return TEST_PAIRS;
+    try {
+        const response = await fetch('https://api.nobitex.ir/market/stats');
+        const data = await response.json();
+
+        // فیلتر کردن فقط جفت‌ارزهایی که به IRT ختم می‌شوند
+        return Object.keys(data?.stats || {}).filter(pair => pair.toLowerCase().endsWith('-rls'));
+    } catch (error) {
+        console.error('❌ خطا در دریافت لیست جفت‌ارزهای نوبیتکس:', error);
+        return [];
+    }
 }
 
 
@@ -31,22 +50,25 @@ async function fetchNobitexPrices(pairs: string[]) {
         return {};
     }
 }
-
-
-
 // 📌 دریافت قیمت جفت‌ارزها از والکس
 async function fetchWallexPrices(pairs: string[]) {
     try {
-        const { data } = await axios.get('https://api.wallex.ir/v1/markets');
+        const response = await fetch('https://api.wallex.ir/v1/markets');
+        const data = await response.json();
 
         return pairs.reduce((prices, pair) => {
-            // تبدیل نام جفت‌ارز به فرمت والکس
-            let wallexPair = pair.replace('-rls', 'tmn').toUpperCase(); 
+            let wallexPair;
+
+            if (pair.endsWith('-usdt')) {
+                wallexPair = pair.replace('-usdt', '').toUpperCase() + 'USDT'; // تبدیل به فرمت والکس
+            } else {
+                wallexPair = pair.replace('-rls', '').toUpperCase() + 'TMN'; // تبدیل به فرمت والکس
+            }
 
             // دریافت قیمت از API
             let price = data?.result?.symbols?.[wallexPair]?.stats?.lastPrice;
-            
-            // تبدیل مقدار به عدد و ضرب در ۱۰ (در صورت نیاز)
+
+            // تبدیل مقدار به عدد و ضرب در ۱۰ (برای تومان)
             prices[pair] = price ? parseFloat(price) * 10 : 0;
 
             return prices;
@@ -56,8 +78,6 @@ async function fetchWallexPrices(pairs: string[]) {
         return {};
     }
 }
-
-
 
 // 📌 هندلر `GET` برای دریافت اطلاعات آربیتراژ
 export async function GET() {
