@@ -1,54 +1,85 @@
 import 'dotenv/config';
 import axios from 'axios';
 import { NextResponse } from 'next/server';
-const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
-export async function GET() {
+
+// 📌 لیست ۱۰ جفت ارز برتر برای تست اولیه
+const TEST_PAIRS = [
+    'usdt-rls', 'btc-rls', 'eth-rls', 'xrp-rls', 'ada-rls',
+    'dot-rls', 'doge-rls', 'trx-rls', 'ltc-rls', 'bnb-rls'
+];
+
+// 📌 دریافت فقط این ۱۰ جفت ارز
+async function getNobitexPairs() {
+    return TEST_PAIRS;
+}
+
+
+
+// 📌 دریافت قیمت جفت‌ارزها از نوبیتکس
+async function fetchNobitexPrices(pairs: string[]) {
     try {
-        const [nobitexPrice, wallexPrice] = await Promise.all([
-            getNobitexPrice(),
-            getWallexPrice()
-        ]);
+        const response = await fetch('https://api.nobitex.ir/market/stats');
+        const data = await response.json();
 
-        if (nobitexPrice && wallexPrice) {
-            const difference = Math.abs(nobitexPrice - wallexPrice);
-
-            return NextResponse.json({
-                success: true,
-                nobitex: nobitexPrice,
-                wallex: wallexPrice,
-                difference: difference
-            });
-        } else {
-            return NextResponse.json({ success: false, error: "عدم دریافت قیمت" }, { status: 500 });
-        }
+        return pairs.reduce((prices, pair) => {
+            let nobitexPair = pair.toLowerCase(); // تبدیل به حروف کوچک (نوبیتکس حروف کوچک دارد)
+            prices[pair] = data?.stats?.[nobitexPair]?.latest || 0;
+            return prices;
+        }, {} as Record<string, number>);
     } catch (error) {
-        console.error('خطا:', error);
-        return NextResponse.json({ success: false, error: 'مشکلی رخ داد.' }, { status: 500 });
+        console.error('❌ خطا در دریافت قیمت‌های نوبیتکس:', error);
+        return {};
     }
 }
 
-// دریافت قیمت از نوبیتکس
-async function getNobitexPrice(): Promise<number | null> {
-    try {
-        const { data } = await axios.post('https://api.nobitex.ir/market/stats', {
-            srcCurrency: 'usdt',
-            dstCurrency: 'rls'
-        });
-        return data?.stats?.['usdt-rls']?.latest ? parseFloat(data.stats['usdt-rls'].latest) : null;
-    } catch (error) {
-        return null;
-    }
-}
 
-// دریافت قیمت از والکس
-async function getWallexPrice(): Promise<number | null> {
+
+// 📌 دریافت قیمت جفت‌ارزها از والکس
+async function fetchWallexPrices(pairs: string[]) {
     try {
         const { data } = await axios.get('https://api.wallex.ir/v1/markets');
-        return data?.result?.symbols?.['USDTTMN']?.stats?.lastPrice
-            ? parseFloat(data.result.symbols['USDTTMN'].stats.lastPrice) * 10
-            : null;
+
+        return pairs.reduce((prices, pair) => {
+            // تبدیل نام جفت‌ارز به فرمت والکس
+            let wallexPair = pair.replace('-rls', 'tmn').toUpperCase(); 
+
+            // دریافت قیمت از API
+            let price = data?.result?.symbols?.[wallexPair]?.stats?.lastPrice;
+            
+            // تبدیل مقدار به عدد و ضرب در ۱۰ (در صورت نیاز)
+            prices[pair] = price ? parseFloat(price) * 10 : 0;
+
+            return prices;
+        }, {} as Record<string, number>);
     } catch (error) {
-        return null;
+        console.error('❌ خطا در دریافت قیمت‌های والکس:', error);
+        return {};
     }
 }
+
+
+
+// 📌 هندلر `GET` برای دریافت اطلاعات آربیتراژ
+export async function GET() {
+    try {
+        const pairs = await getNobitexPairs();
+        const [nobitex, wallex] = await Promise.all([
+            fetchNobitexPrices(pairs),
+            fetchWallexPrices(pairs)
+        ]);
+
+        const prices = pairs.map(pair => ({
+            pair,
+            nobitex: nobitex[pair] || 0,
+            wallex: wallex[pair] || 0,
+            difference: (wallex[pair] || 0) - (nobitex[pair] || 0),
+            percentage: nobitex[pair] ? (((wallex[pair] - nobitex[pair]) / nobitex[pair]) * 100) : 0
+        })).sort((a, b) => b.percentage - a.percentage); // مرتب‌سازی
+
+        return NextResponse.json({ success: true, prices });
+    } catch (error) {
+        console.error('❌ خطا در پردازش API:', error);
+        return NextResponse.json({ success: false, message: 'خطایی رخ داد' }, { status: 500 });
+    }
+}
+

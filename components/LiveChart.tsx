@@ -1,202 +1,120 @@
 'use client';
-import { Line } from 'react-chartjs-2';
 import { useEffect, useState } from 'react';
-import '@/components/chartSetup';
-import { sendTelegramMessage } from '@/components/telegramUtils'; // 📌 مطمئن شو این فایل وجود داره!
 
-// 📢 ارسال نوتیفیکیشن مرورگر
-export function sendNotification(title: string, message: string) {
-    if ("Notification" in window && Notification.permission === "granted") {
-        new Notification(title, {
-            body: message,
-            icon: "/favicon.ico",
-        });
-    }
-}
-
-const MAX_HISTORY = 8640; // حداکثر تعداد رکوردها در ۲۴ ساعت (هر ۱۰ ثانیه یک داده)
+// 📌 تنظیمات اولیه
+const PAGE_SIZE = 20; // تعداد جفت ارزهایی که هر بار نمایش داده می‌شود
 
 const LiveChart = () => {
-    const [nobitexPrices, setNobitexPrices] = useState<number[]>([]);
-    const [wallexPrices, setWallexPrices] = useState<number[]>([]);
-    const [differences, setDifferences] = useState<number[]>([]);
-    const [labels, setLabels] = useState<string[]>([]);
-    const [bestArbitrage, setBestArbitrage] = useState<{ time: string, difference: number }>({ time: "", difference: 0 });
+    const [prices, setPrices] = useState<{ pair: string; nobitex: number; wallex: number; difference: number; percentage: number }[]>([]);
+    const [visibleData, setVisibleData] = useState<typeof prices>([]);
+    const [sortField, setSortField] = useState<string | null>('percentage');
+    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+    const [page, setPage] = useState(1);
+    const [investment, setInvestment] = useState(100000000); // مقدار پیش‌فرض ۱۰۰ میلیون
 
-  // مقدار اولیه فقط برای جلوگیری از خطای SSR، بعداً مقداردهی می‌شود
-  const [currentPrices, setCurrentPrices] = useState({ nobitex: 0, wallex: 0, difference: 0 });
-  const [history, setHistory] = useState<{ time: string, nobitex: number, wallex: number, difference: number }[]>([]);
+    // 📌 دریافت داده‌ها از API
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await fetch('/api/arbitrage');
+                const result = await response.json();
+    
+                if (result.success) {
+                    const sortedData = result.prices.map((item: any) => ({
+                        pair: item.pair,
+                        nobitex: item.nobitex || 0,
+                        wallex: item.wallex || 0,
+                        difference: item.difference || 0,
+                        percentage: item.percentage ?? 0,
+                    })).sort((a, b) => b.percentage - a.percentage);
+    
+                    setPrices(sortedData);
+                    setVisibleData(sortedData.slice(0, page * PAGE_SIZE));
+                }
+            } catch (error) {
+                console.error('❌ خطا در دریافت داده‌ها:', error);
+            }
+        };
+    
+        fetchData(); // اولین بار بلافاصله داده‌ها رو دریافت کن
+        const interval = setInterval(fetchData, 100000); // بعد از اون هر ۱۰ ثانیه آپدیت کن
+    
+        return () => clearInterval(interval); // موقع خروج از کامپوننت، تایمر رو پاک کن
+    }, []);
+    
 
-  useEffect(() => {
-      if (typeof window !== "undefined") {
-          // دریافت مقدار ذخیره‌شده در `localStorage`
-          const savedPrices = localStorage.getItem('currentPrices');
-          if (savedPrices) setCurrentPrices(JSON.parse(savedPrices));
+    // 📌 لود تدریجی داده‌ها هنگام اسکرول
+    const handleScroll = () => {
+        if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
+            setPage(prevPage => prevPage + 1);
+        }
+    };
 
-          const savedHistory = localStorage.getItem('history');
-          if (savedHistory) setHistory(JSON.parse(savedHistory));
-      }
-  }, []);
+    useEffect(() => {
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
-  useEffect(() => {
-      const fetchData = async () => {
-          try {
-              const response = await fetch('/api/arbitrage');
-              const result = await response.json();
-              console.log('📡 دریافت داده:', result);
+    useEffect(() => {
+        setVisibleData(prices.slice(0, page * PAGE_SIZE));
+    }, [page, prices]);
 
-              if (result.success && result.nobitex && result.wallex) {
-                  const now = new Date().toLocaleTimeString();
+    // 📌 مرتب‌سازی جدول هنگام کلیک روی ستون‌ها
+    const handleSort = (field: keyof typeof prices[0]) => {
+        const newOrder = sortField === field && sortOrder === 'desc' ? 'asc' : 'desc';
+        setSortField(field);
+        setSortOrder(newOrder);
 
-                  // اضافه کردن داده جدید به تاریخچه
-                  const newRecord = { time: now, nobitex: result.nobitex, wallex: result.wallex, difference: result.difference };
-                  setHistory(prev => {
-                      const updatedHistory = [...prev.slice(-MAX_HISTORY + 1), newRecord];
-                      if (typeof window !== "undefined") {
-                          localStorage.setItem('history', JSON.stringify(updatedHistory));
-                      }
-                      return updatedHistory;
-                  });
+        const sortedData = [...prices].sort((a, b) => {
+            if (newOrder === 'asc') return (a[field] as number) - (b[field] as number);
+            return (b[field] as number) - (a[field] as number);
+        });
 
-                  // بروزرسانی قیمت‌ها
-                  setNobitexPrices(prev => [...prev.slice(-9), result.nobitex]);
-                  setWallexPrices(prev => [...prev.slice(-9), result.wallex]);
-                  setDifferences(prev => [...prev.slice(-9), result.difference]);
-                  setLabels(prev => [...prev.slice(-9), now]);
-
-                  // بروزرسانی مقدار `currentPrices`
-                  setCurrentPrices({
-                      nobitex: result.nobitex,
-                      wallex: result.wallex,
-                      difference: result.difference
-                  });
-
-                  if (typeof window !== "undefined") {
-                      localStorage.setItem('currentPrices', JSON.stringify({
-                          nobitex: result.nobitex,
-                          wallex: result.wallex,
-                          difference: result.difference
-                      }));
-                  }
-
-                  // بررسی بهترین فرصت آربیتراژ
-                  if (result.difference > bestArbitrage.difference) {
-                      setBestArbitrage({ time: now, difference: result.difference });
-
-                    //   // ✅ ارسال به تلگرام
-                    //   const message = `
-                    //   🚀 *بهترین فرصت آربیتراژ در ۲۴ ساعت اخیر!* 🚀
-                    //   ⏰ زمان: ${now}
-                    //   🔍 اختلاف قیمت: ${result.difference.toLocaleString()} ریال
-                    //   💰 *قیمت نوبیتکس:* ${result.nobitex.toLocaleString()} ریال
-                    //   💰 *قیمت والکس:* ${result.wallex.toLocaleString()} ریال
-                    //   📢 فرصت را از دست ندهید!
-                    //   `;
-                    //   sendTelegramMessage(message);
-                  }
-
-                  // ارسال نوتیفیکیشن اگر اختلاف زیاد باشد
-                  if (result.difference > 15000) {
-                      sendNotification("🚀 فرصت آربیتراژ!", `اختلاف قیمت به ${result.difference.toLocaleString()} ریال رسید!`);
-                  }
-              } else {
-                  console.warn('⚠️ مقدار نامعتبر از API:', result);
-              }
-          } catch (error) {
-              console.error('❌ خطا در دریافت داده‌ها:', error);
-          }
-      };
-
-      const interval = setInterval(fetchData, 10000);
-      return () => clearInterval(interval);
-
-  }, [bestArbitrage]);
-
+        setPrices(sortedData);
+        setVisibleData(sortedData.slice(0, page * PAGE_SIZE));
+    };
 
     return (
-        <div className="max-w-2xl mx-auto p-4">
-            {/* 📌 نمایش قیمت‌های لحظه‌ای */}
-            <div className="bg-gray-100 p-4 rounded-md shadow-md text-center mb-4">
-                <h2 className="text-xl font-bold">📊 قیمت‌های لحظه‌ای</h2>
-                <p className="text-blue-600 font-semibold">💰 قیمت نوبیتکس: {currentPrices.nobitex.toLocaleString()} ریال</p>
-                <p className="text-green-600 font-semibold">💰 قیمت والکس: {currentPrices.wallex.toLocaleString()} ریال</p>
-                <p className="text-red-600 font-semibold">🔍 اختلاف قیمت: {currentPrices.difference.toLocaleString()} ریال</p>
-            </div>
+        <div className="max-w-4xl mx-auto p-4">
+            <h2 className="text-xl font-bold text-center mb-4">📊 فرصت‌های آربیتراژ</h2>
 
-            {/* 📌 نمایش بهترین فرصت آربیتراژ در ۲۴ ساعت اخیر */}
-            <div className="bg-yellow-100 p-4 rounded-md shadow-md text-center mb-4">
-                <h2 className="text-xl font-bold">🔥 بهترین فرصت آربیتراژ ۲۴ ساعت اخیر</h2>
-                <p className="text-red-600 font-semibold">🔍 بیشترین اختلاف قیمت: {bestArbitrage.difference.toLocaleString()} ریال</p>
-                <p className="text-gray-700">⏰ در ساعت: {bestArbitrage.time}</p>
-            </div>
-
-            {/* 📌 نمایش چارت */}
-            <div className="bg-white p-4 rounded-md shadow-md">
-                <h2 className="text-xl font-bold text-center mb-2">📈 نمودار تغییرات قیمت</h2>
-                <Line
-                    data={{
-                        labels,
-                        datasets: [
-                            {
-                                label: 'قیمت نوبیتکس',
-                                data: nobitexPrices,
-                                borderColor: 'blue',
-                                backgroundColor: 'rgba(0, 0, 255, 0.2)',
-                                fill: false,
-                                pointStyle: 'circle',
-                                pointRadius: 5,
-                                borderWidth: 2,
-                                yAxisID: 'priceAxis'
-                            },
-                            {
-                                label: 'قیمت والکس',
-                                data: wallexPrices,
-                                borderColor: 'green',
-                                backgroundColor: 'rgba(0, 255, 0, 0.2)',
-                                fill: false,
-                                pointStyle: 'triangle',
-                                pointRadius: 5,
-                                borderWidth: 2,
-                                yAxisID: 'priceAxis'
-                            },
-                            {
-                                label: 'اختلاف قیمت',
-                                data: differences,
-                                borderColor: 'red',
-                                backgroundColor: 'rgba(255, 0, 0, 0.2)',
-                                fill: false,
-                                borderDash: [5, 5],
-                                pointStyle: 'rectRot',
-                                pointRadius: 5,
-                                borderWidth: 2,
-                                yAxisID: 'diffAxis'
-                            }
-                        ]
-                    }}
-                    options={{
-                        responsive: true,
-                        plugins: { legend: { display: true } },
-                        scales: {
-                            x: { display: true },
-                            priceAxis: {
-                                type: 'linear',
-                                position: 'left',
-                                ticks: {
-                                    callback: value => value.toLocaleString()
-                                },
-                                suggestedMin: Math.min(...nobitexPrices, ...wallexPrices) - 1000,
-                                suggestedMax: Math.max(...nobitexPrices, ...wallexPrices) + 1000
-                            },
-                            diffAxis: {
-                                type: 'linear',
-                                position: 'right',
-                                grid: { drawOnChartArea: false }
-                            }
-                        }
-                    }}
-                    style={{ width: '100%', height: '400px' }}
+            {/* 📌 فیلد ورودی برای مبلغ سرمایه */}
+            <div className="mb-4">
+                <label className="font-bold">💰 مبلغ سرمایه‌گذاری (ریال):</label>
+                <input
+                    type="number"
+                    value={investment}
+                    onChange={(e) => setInvestment(Number(e.target.value))}
+                    className="border p-2 rounded w-full"
                 />
             </div>
+
+            <table className="w-full border-collapse border border-gray-300">
+                <thead>
+                    <tr className="bg-gray-200">
+                        <th className="p-2 border cursor-pointer" onClick={() => handleSort('pair')}>🪙 جفت ارز</th>
+                        <th className="p-2 border cursor-pointer" onClick={() => handleSort('nobitex')}>💰 نوبیتکس</th>
+                        <th className="p-2 border cursor-pointer" onClick={() => handleSort('wallex')}>💰 والکس</th>
+                        <th className="p-2 border cursor-pointer" onClick={() => handleSort('difference')}>🔍 اختلاف قیمت</th>
+                        <th className="p-2 border cursor-pointer" onClick={() => handleSort('percentage')}>📈 درصد اختلاف</th>
+                        <th className="p-2 border cursor-pointer" onClick={() => handleSort('profit')}>💵 سود {investment.toLocaleString()} ریال</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {visibleData.map(({ pair, nobitex, wallex, difference, percentage }) => {
+                        const profit = nobitex > 0 ? (investment * (difference / nobitex)) : 0;
+                        return (
+                            <tr key={pair} className="text-center">
+                            <td className="p-2 border">{pair}</td>
+                            <td className="p-2 border">{new Intl.NumberFormat().format(nobitex)} ریال</td>                            <td className="p-2 border">{wallex.toLocaleString()} ریال</td>  {/* ✅ جداکننده سه‌رقمی */}
+                            <td className="p-2 border text-red-500">{difference.toLocaleString()} ریال</td>  {/* ✅ جداکننده سه‌رقمی */}
+                            <td className="p-2 border text-green-600">{percentage.toFixed(2)}%</td>
+                            <td className="p-2 border text-blue-500">{profit.toLocaleString()} ریال</td>  {/* ✅ جداکننده سه‌رقمی */}
+                        </tr>
+                        );
+                    })}
+                </tbody>
+            </table>
         </div>
     );
 };
