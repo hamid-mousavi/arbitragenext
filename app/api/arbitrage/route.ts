@@ -19,18 +19,63 @@ const TEST_PAIRS = [
 //         return [];
 //     }
 // }
-async function getNobitexPairs() {
-    try {
-        const response = await fetch('https://api.nobitex.ir/market/stats');
-        const data = await response.json();
+interface MarketStats {
+    isClosed?: boolean;
+}
 
-        // فیلتر کردن فقط جفت‌ارزهایی که به IRT ختم می‌شوند
-        return Object.keys(data?.stats || {}).filter(pair => pair.toLowerCase().endsWith('-rls'));
+interface NobitexResponse {
+    status: string;
+    stats: Record<string, MarketStats>;
+}
+
+interface WallexResponse {
+    result: {
+        symbols: Record<string, { stats: { lastPrice: string } }>;
+    };
+}
+
+// تبدیل جفت‌ارزهای نوبیتکس به فرمت والکس
+function convertToWallexFormat(pair: string): string {
+    if (pair.endsWith('-usdt')) {
+        return pair.replace('-usdt', '').toUpperCase() + 'USDT';
+    } else if (pair.endsWith('-rls')) {
+        return pair.replace('-rls', '').toUpperCase() + 'TMN';
+    }
+    return '';
+}
+
+async function getNobitexPairs(): Promise<string[]> {
+    try {
+        // دریافت داده‌های نوبیتکس و والکس هم‌زمان
+        const [nobitexResponse, wallexResponse] = await Promise.all([
+            fetch('https://api.nobitex.ir/market/stats').then(res => res.json() as Promise<NobitexResponse>),
+            fetch('https://api.wallex.ir/v1/markets').then(res => res.json() as Promise<WallexResponse>)
+        ]);
+
+        // استخراج لیست جفت‌ارزهای والکس با تبدیل به فرمت استاندارد
+        const wallexPairs = new Set(
+            Object.keys(wallexResponse.result.symbols || {}).map(pair => pair.toUpperCase())
+        );
+
+        // فیلتر کردن جفت‌ارزهای نوبیتکس بر اساس:
+        // 1. به "-rls" ختم شوند.
+        // 2. isClosed=false باشد.
+        // 3. در لیست جفت‌ارزهای والکس موجود باشند.
+        return Object.entries(nobitexResponse.stats || {})
+            .filter(([pair, details]) => {
+                const convertedPair = convertToWallexFormat(pair);
+                return pair.toLowerCase().endsWith('-rls') &&
+                       !details.isClosed &&
+                       wallexPairs.has(convertedPair);
+            })
+            .map(([pair]) => pair);
     } catch (error) {
-        console.error('❌ خطا در دریافت لیست جفت‌ارزهای نوبیتکس:', error);
+        console.error('❌ خطا در دریافت داده‌ها:', error);
         return [];
     }
 }
+
+
 
 
 

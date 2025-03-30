@@ -157,7 +157,7 @@ const LiveChart = () => {
               const profit =
                 nobitex > 0 ? investment * (difference / nobitex) : 0;
               return (
-                <tr key={pair} className="text-center"><td className="p-2 border">{pair}</td><td className="p-2 border">{new Intl.NumberFormat().format(nobitex).trim()}</td><td className="p-2 border">{wallex.toLocaleString()} </td><td className="p-2 border text-red-500">{difference.toLocaleString()} </td><td className="p-2 border text-green-600">{percentage.toFixed(2)}%</td><td className="p-2 border text-blue-500">{Math.floor(profit * 10).toLocaleString()}</td></tr>
+                <tr key={pair} className="text-center"><td className="p-2 border">{pair}</td><td className="p-2 border">{new Intl.NumberFormat().format(nobitex).trim()}</td><td className="p-2 border">{wallex.toLocaleString()} </td><td className="p-2 border text-red-500">{difference.toLocaleString()} </td><td className="p-2 border text-green-600">{percentage.toFixed(2)}%</td><td className="p-2 border text-blue-500">{Math.floor(profit).toLocaleString()}</td></tr>
               );
             }
           )}
