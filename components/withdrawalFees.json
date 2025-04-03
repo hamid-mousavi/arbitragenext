@@ -113,27 +113,11 @@
     },
     {
       "currency": "DOGE",
-      "network": "BEP20 (BSC)",
-      "withdrawal_fee": "N/A",
-      "min_withdrawal": "N/A",
-      "current_balance": "0 doge",
-      "current_withdrawal_fee": "0 doge"
-    },
-    {
-      "currency": "DOGE",
       "network": "Dogecoin",
       "withdrawal_fee": "8 doge",
       "min_withdrawal": "50 doge",
       "current_balance": "0 doge",
       "current_withdrawal_fee": "1 doge"
-    },
-    {
-      "currency": "ADA",
-      "network": "BEP20 (BSC)",
-      "withdrawal_fee": "N/A",
-      "min_withdrawal": "N/A",
-      "current_balance": "0 ada",
-      "current_withdrawal_fee": "0 ada"
     },
     {
       "currency": "ADA",
@@ -257,14 +241,6 @@
     },
     {
       "currency": "LTC",
-      "network": "BEP20 (BSC)",
-      "withdrawal_fee": "N/A",
-      "min_withdrawal": "N/A",
-      "current_balance": "0 ltc",
-      "current_withdrawal_fee": "0 ltc"
-    },
-    {
-      "currency": "LTC",
       "network": "LTC",
       "withdrawal_fee": "0.005 ltc",
       "min_withdrawal": "0.005 ltc",
@@ -305,14 +281,6 @@
     },
     {
       "currency": "BCH",
-      "network": "BEP20 (BSC)",
-      "withdrawal_fee": "N/A",
-      "min_withdrawal": "N/A",
-      "current_balance": "0 bch",
-      "current_withdrawal_fee": "0 bch"
-    },
-    {
-      "currency": "BCH",
       "network": "BCH",
       "withdrawal_fee": "0.01 bch",
       "min_withdrawal": "0.01 bch",
@@ -350,6 +318,399 @@
           "min_withdrawal": "1 cvx",
           "current_balance": "0 cvx",
           "current_withdrawal_fee": "0 cvx"
+        },
+        {
+          "currency": "AXS",
+          "network": "BEP20",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "0.182",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
+        },
+        {
+          "currency": "SUSHI",
+          "network": "ERC20",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "7.02",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
+        },
+        {
+          "currency": "MANA",
+          "network": "ERC20",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "16.64",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
+        },
+        {
+          "currency": "ONE",
+          "network": "HARMONY",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "1",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
+        },
+        {
+          "currency": "ATOM",
+          "network": "COSMOS",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "0.01 ATOM",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
+        },
+        {
+          "currency": "CELR",
+          "network": "ERC20",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "436 CELR",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
+        },
+        {
+          "currency": "FIL",
+          "network": "FILECOIN",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "0.001 FIL",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
+        },
+        {
+          "currency": "XLM",
+          "network": "STELLAR LUMENS",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "0.01 XLM",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
+        },
+        {
+          "currency": "EIGEN",
+          "network": "ERC20",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "4.78",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
+        },
+        {
+          "currency": "S",
+          "network": "SONIC",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "0.3",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
+        },
+        {
+          "currency": "MKR",
+          "network": "BEP20",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "0.00052",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
+        },
+        {
+          "currency": "APE",
+          "network": "BEP20",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "1.1",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
+        },
+        {
+          "currency": "JASMY",
+          "network": "ERC20",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "390 JASMY",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
+        },
+        {
+          "currency": "AVAX",
+          "network": "AVALANCHE",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "0.016 AVAX",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
+        },
+        {
+          "currency": "DAI",
+          "network": "BEP20",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "1.2 DAI",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
+        },
+        {
+          "currency": "OM",
+          "network": "ERC20",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "0.64",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
+        },
+        {
+          "currency": "XAUT",
+          "network": "ERC20",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "0.0025",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
+        },
+        {
+          "currency": "1INCH",
+          "network": "BEP20",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "3.36",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
+        },
+        {
+          "currency": "MEME",
+          "network": "ERC20",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "2082",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
+        },
+        {
+          "currency": "XTZ",
+          "network": "TEZOS",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "0.2",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
+        },
+        {
+          "currency": "AAVE",
+          "network": "BEP20",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "0.0138",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
+        },
+        {
+          "currency": "FET",
+          "network": "ERC20",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "9.08",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
+        },
+        {
+          "currency": "POL",
+          "network": "POLYGON",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "0.1",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
+        },
+        {
+          "currency": "YFI",
+          "network": "BEP20",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "0.000198",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
+        },
+        {
+          "currency": "JST",
+          "network": "TRC20",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "100",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
+        },
+        {
+          "currency": "NEAR",
+          "network": "NEAR PROTOCOL",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "0.036",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
+        },
+        {
+          "currency": "EGLD",
+          "network": "MULTIVERS EGLD",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "0.0016",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
+        },
+        {
+          "currency": "MAJOR",
+          "network": "TON",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "0.25",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
+        },
+        {
+          "currency": "SAND",
+          "network": "ERC20",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "15.28",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
+        },
+        {
+          "currency": "TON",
+          "network": "TON",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "0.02",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
+        },
+        {
+          "currency": "CAKE",
+          "network": "BEP20",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "0.5",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
+        },
+        {
+          "currency": "NOT",
+          "network": "TON",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "50",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
+        },
+        {
+          "currency": "DOGS",
+          "network": "TON",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "200",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
+        },
+        {
+          "currency": "DOGE",
+          "network": "DOGECOIN",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "8",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
+        },
+        {
+          "currency": "ADA",
+          "network": "CARDANO",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "1",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
+        },
+        {
+          "currency": "USDC",
+          "network": "BEP20",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "1.5",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
+        },
+        {
+          "currency": "SOL",
+          "network": "SOLANA",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "0.01",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
+        },
+        {
+          "currency": "DYDX",
+          "network": "ERC20",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "12.5",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
+        },
+        {
+          "currency": "ARB",
+          "network": "ARBITRUM ONE",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "1",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
+        },
+        {
+          "currency": "ARB",
+          "network": "ERC20",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "12.8",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
+        },
+        {
+          "currency": "ETH",
+          "network": "ERC20",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "0.001",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
+        },
+        {
+          "currency": "HMSTR",
+          "network": "TON",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "100",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
+        },
+        {
+          "currency": "X",
+          "network": "TON",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "3000",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
+        },
+        {
+          "currency": "CHZ",
+          "network": "ERC20",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "96",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
+        },
+        {
+          "currency": "EOS",
+          "network": "EOS",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "0.1",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
+        },
+        {
+          "currency": "EOS",
+          "network": "BEP20",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "1.7",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
+        },
+        {
+          "currency": "GMT",
+          "network": "BEP20",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "N/A",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
+        },
+        {
+          "currency": "WLD",
+          "network": "ERC20",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "5.38",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
+        },
+        {
+          "currency": "PAXG",
+          "network": "ERC20",
+          "min_withdrawal": "0",
+          "withdrawal_fee": "0.003",
+          "current_balance": "0",
+          "current_withdrawal_fee": "0"
         }
+      
       
   ]

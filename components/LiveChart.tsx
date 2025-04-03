@@ -108,7 +108,7 @@ const [displayInvestment, setDisplayInvestment] = useState('۱٬۰۰۰٬۰۰۰٬
     const tradingFees = profitInRial * (makerFeeWallex + takerFeeNobitex);
     const totalProfit = profitInRial - tradingFees - withdrawalFeeInRial;
     
-    return Math.max(0, totalProfit); // جلوگیری از سود منفی
+    return totalProfit; // حذف Math.max برای نمایش مقادیر منفی
   };
 
   // تابع مرتب‌سازی
@@ -276,6 +276,7 @@ const [displayInvestment, setDisplayInvestment] = useState('۱٬۰۰۰٬۰۰۰٬
         </thead>
         <tbody>
           {visibleData.map((item) => (
+            
             <tr key={item.pair} className="text-center hover:bg-gray-50">
               <td className="p-2 border">{item.pair}</td>
               <td className="p-2 border">{item.nobitex.toLocaleString('fa-IR')}</td>
@@ -284,24 +285,29 @@ const [displayInvestment, setDisplayInvestment] = useState('۱٬۰۰۰٬۰۰۰٬
               <td className="p-2 border text-green-600">{item.percentage.toFixed(2)}%</td>
               <td className="p-2 border text-blue-500">{Math.floor(item.profit).toLocaleString('fa-IR')}</td>
               <td className="p-2 border">
-                <select 
-                  value={item.selectedNetwork}
-                  onChange={(e) => handleNetworkChange(item.pair, e.target.value)}
-                  className="border rounded p-1 text-xs w-full"
-                >
-                  {networkOptions[item.pair]?.map(option => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </td>
+  <select 
+    value={item.selectedNetwork}
+    onChange={(e) => handleNetworkChange(item.pair, e.target.value)}
+    className="border rounded p-1 text-xs w-full"
+  >
+    {networkOptions[item.pair]?.map((option, index) => (
+      <option 
+        key={`${item.pair}-${option.value}-${index}`} // ایجاد key منحصر به فرد
+        value={option.value}
+      >
+        {option.label}
+      </option>
+    ))}
+  </select>
+</td>
               <td className="p-2 border">
                 {item.withdrawalFee} {item.pair.split('-')[0]}
               </td>
-              <td className="p-2 border text-purple-600 font-medium">
-                {Math.floor(item.totalProfit).toLocaleString('fa-IR')}
-              </td>
+              <td className={`p-2 border font-medium ${
+  item.totalProfit < 0 ? 'text-red-600' : 'text-purple-600'
+}`}>
+  {Math.floor(item.totalProfit).toLocaleString('fa-IR')}
+</td>
               <td className="p-2 border">{item.bestBid.toLocaleString('fa-IR')}</td>
               <td className="p-2 border">{item.bestAsk.toLocaleString('fa-IR')}</td>
               <td className="p-2 border text-orange-600">{item.spread.toFixed(2)}%</td>
